@@ -1,11 +1,13 @@
 {
     "printers": [
         {
+            "type": "bamboo",
             "name": "Printer #1",
             "ip": "192.168.1.1",
             "pw": "12345678"
         },
         {
+            "type": "bamboo",
             "name": "Printer #2",
             "ip": "192.168.1.2",
             "pw": "12345678"
