@@ -4,7 +4,7 @@ import tkinter.scrolledtext as st
 import json, os
 import threading, queue
 
-from Printer import Printer
+from Printer import BambooPrinter
 from Log import Logger
 
 class App():
@@ -35,12 +35,14 @@ class App():
 
         for printer in self.settings["printers"]:
             var = tk.BooleanVar()
-            self.printers.append(Printer(
-                name = printer["name"],
-                ip = printer["ip"],
-                pw = printer["pw"],
-                enabled = var
-            ))
+            match printer["type"]:
+                case "bamboo":
+                    self.printers.append(BambooPrinter(
+                        name=printer["name"],
+                        ip=printer["ip"],
+                        pw=printer["pw"],
+                        enabled=var
+                    ))
 
             checkbox = tk.Checkbutton(self.printerSelectFrame, text=printer["name"], variable=var, onvalue=True, offvalue=False)
             checkbox.pack(side=tk.LEFT, pady=10)
@@ -105,15 +107,14 @@ class App():
                     with open(os.path.join(self.fileDirectory,filename), 'rb') as file:
                         self.logQueue.put("Sending " + str(filename) + " to printer " + printer.name + "..." )
                         
-                        printer.ftp.storbinary(f'STOR {filename}', file)
+                        printer.upload(filename, file)
                         self.logQueue.put("Success: " + str(filename) + " to printer " + printer.name)
 
                 except:
                     try:
                         with open(os.path.join(self.fileDirectory,filename), 'rb') as file:
-                            self.logQueue.put("Reattempting to send " + str(filename) + " to printer " + printer["name"] + "..." )
-                            printer.ftp.storbinary(f'STOR {filename}', file)
                             self.logQueue.put("Reattempting to send " + str(filename) + " to printer " + printer.name + "..." )
+                            printer.upload(filename, file)
                             self.logQueue.put("Success: " + str(filename) + " to printer " + printer.name)
                     except:
                         self.logQueue.put("Failure: " + str(filename) + " to printer " + printer.name)
