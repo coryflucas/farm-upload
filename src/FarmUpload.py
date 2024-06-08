@@ -113,6 +113,7 @@ class App():
                         with open(os.path.join(self.fileDirectory,filename), 'rb') as file:
                             self.logQueue.put("Reattempting to send " + str(filename) + " to printer " + printer["name"] + "..." )
                             printer.ftp.storbinary(f'STOR {filename}', file)
+                            self.logQueue.put("Reattempting to send " + str(filename) + " to printer " + printer.name + "..." )
                             self.logQueue.put("Success: " + str(filename) + " to printer " + printer.name)
                     except:
                         self.logQueue.put("Failure: " + str(filename) + " to printer " + printer.name)
